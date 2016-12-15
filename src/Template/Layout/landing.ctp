@@ -7,7 +7,7 @@
 
         <!-- CSS  -->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="bower_components/Materialize/dist/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+        <link href="bower_components/materialize/dist/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
         <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     </head>
     <body>
@@ -73,7 +73,7 @@
 
         <!--  Scripts-->
         <script src="bower_components/jquery/dist/jquery.js"></script>
-        <script src="bower_components/Materialize/dist/js/materialize.js"></script>
+        <script src="bower_components/materialize/dist/js/materialize.js"></script>
         <script src="bower_components/angular/angular.min.js"></script>
         <script src="bower_components/angular-route/angular-route.min.js"></script>
         <script src="bower_components/angular-materialize/src/angular-materialize.js"></script>
