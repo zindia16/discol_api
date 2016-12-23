@@ -67,7 +67,7 @@ angular.module('LandingApp').controller('login',[
                 $scope.response = res;
 				console.log(res);
                 if($scope.response.success===true){
-					$scope.response.message = "You have been successfully signed up. Go to Login page to signin to your account!!"
+					$scope.response.message = "You have been successfully signed up. Go to Login page to signin to your account!!";
                     $scope.user = {};
                 }
             }).error(function(err){

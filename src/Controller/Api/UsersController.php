@@ -10,9 +10,48 @@ class UsersController extends AppController
 
     public function beforeFilter(Event $event){
         parent::beforeFilter($event);
-        $this->Auth->allow(['login','logout','signup','test']);
+        $this->Auth->allow(['login','logout','signup','test','isEmailExists','isUserExists']);
     }
-    
+
+	public function isEmailExists(){
+		$email=$this->request->data['value'];
+		$user=$this->Users->find('all')->where(['email'=>$email])->count();
+
+		//pr($user);
+		if($user){
+			$this->set([
+	                    'isValid'=>FALSE,
+	                    'value'=>'Email exists!',
+	                    '_serialize'=>['isValid','value']
+	                ]);
+		}else{
+			$this->set([
+	                    'isValid'=>TRUE,
+	                    'value'=>'Email OK!',
+	                    '_serialize'=>['isValid','value']
+	                ]);
+		}
+	}
+	public function isUserExists(){
+		$username=$this->request->data['value'];
+		$user=$this->Users->find('all')->where(['username'=>$username])->count();
+
+		//pr($user);
+		if($user){
+			$this->set([
+	                    'isValid'=>FALSE,
+	                    'value'=>'Username exists!',
+	                    '_serialize'=>['isValid','value']
+	                ]);
+		}else{
+			$this->set([
+	                    'isValid'=>TRUE,
+	                    'value'=>'Username OK!',
+	                    '_serialize'=>['isValid','value']
+	                ]);
+		}
+	}
+
     public function test(){
         $this->set([
                     'success'=>TRUE,
@@ -24,11 +63,11 @@ class UsersController extends AppController
     public function index(){
         $this->set('users', $this->Users->find('all'));
     }
-    
-    public function signup(){        
+
+    public function signup(){
         if ($this->request->is('post')) {
             $user = $this->Users->newEntity();
-            $data = $this->request->data;           
+            $data = $this->request->data;
             $user = $this->Users->patchEntity($user, $data);
             if ($this->Users->save($user)) {
                 $this->set([
@@ -42,10 +81,10 @@ class UsersController extends AppController
                     'message'=> "Signup Failed",
                     '_serialize'=>['success','message']
                 ]);
-            }            
+            }
         }
     }
-    
+
     public function login(){
         if ($this->request->is('post')) {
             //$user = $this->Auth->identify();
@@ -65,11 +104,11 @@ class UsersController extends AppController
                     'username'=>$data['username'],
                     'password'=>  $hashedPassword
                 ])->first();
-                 * 
-                 */  
+                 *
+                 */
                 $user=$this->Auth->identify();
                 if ($user) {
-                    $token=  base64_encode($data['username'].":".$data['password']);                                       
+                    $token=  base64_encode($data['username'].":".$data['password']);
                     $this->set([
                         'success' => TRUE,
                         'message'=> "Welcome",
@@ -84,9 +123,8 @@ class UsersController extends AppController
                         '_serialize'=>['success','message']
                     ]);
                 }
-            }            
+            }
         }
-    }   
-    
-}
+    }
 
+}
