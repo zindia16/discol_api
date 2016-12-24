@@ -15,14 +15,14 @@ class ContentsController extends AppController {
 
     public function index($contentType = 'post') {
         $contents = $this->Contents->find('all', [
-                    'contain' => [
-                        'Users' => [
-                            'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
-                        ]
+                'contain' => [
+                    'Users' => [
+                        'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
                     ]
-                ])->where([
-                    'content_type' => $contentType
-                ])->order(['Contents.id' => 'DESC'])->limit(50);
+                ]
+            ])->where([
+                'content_type' => $contentType
+            ])->order(['Contents.id' => 'DESC'])->limit(50);
         $this->set([
             'success' => TRUE,
             'message' => "Content fetched",
