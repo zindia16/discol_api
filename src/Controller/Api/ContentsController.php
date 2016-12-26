@@ -13,16 +13,27 @@ class ContentsController extends AppController {
         $this->Auth->allow(['index', 'logout', 'signup', 'test']);
     }
 
-    public function index($contentType = 'post') {
-        $contents = $this->Contents->find('all', [
-                'contain' => [
-                    'Users' => [
-                        'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
-                    ]
-                ]
-            ])->where([
-                'content_type' => $contentType
-            ])->order(['Contents.id' => 'DESC'])->limit(50);
+    public function index($contentType=null) {
+		if($contentType){
+			$contents = $this->Contents->find('all', [
+	                'contain' => [
+	                    'Users' => [
+	                        'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
+	                    ]
+	                ]
+	            ])->where([
+	                'content_type' => $contentType
+	            ])->order(['Contents.id' => 'DESC'])->limit(50);
+		}else{
+			$contents = $this->Contents->find('all', [
+	                'contain' => [
+	                    'Users' => [
+	                        'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
+	                    ]
+	                ]
+	            ])->order(['Contents.id' => 'DESC'])->limit(50);
+		}
+
         $this->set([
             'success' => TRUE,
             'message' => "Content fetched",

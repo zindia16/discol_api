@@ -13,6 +13,24 @@ class CommentsController extends AppController {
         $this->Auth->allow(['index', 'logout', 'signup', 'test']);
     }
 
+	public function getComments($contentId){
+		$comments = $this->Comments->find('all',[
+				'contain'=>[
+					'Users'=>[
+						'fields'=>[
+							'first_name','last_name','id','profile_picture'
+						]
+					]
+				]
+			])->where(['Comments.content_id'=>$contentId]);
+		$this->set([
+            'success' => TRUE,
+            'message' => "Comments Fetched",
+            'comments' => $comments,
+            '_serialize' => ['success', 'message', 'comments']
+        ]);
+	}
+
     public function add() {
         $data = $this->request->data;
         $ndata['user_id'] = $this->Auth->user('id');
@@ -29,6 +47,6 @@ class CommentsController extends AppController {
             '_serialize' => ['success', 'message', 'comment']
         ]);
     }
-    
+
 
 }
