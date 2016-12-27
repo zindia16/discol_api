@@ -13,7 +13,7 @@ class CommentsController extends AppController {
         $this->Auth->allow(['index', 'logout', 'signup', 'test']);
     }
 
-	public function getComments($contentId){
+	public function index($contentId){
 		$comments = $this->Comments->find('all',[
 				'contain'=>[
 					'Users'=>[
@@ -22,7 +22,7 @@ class CommentsController extends AppController {
 						]
 					]
 				]
-			])->where(['Comments.content_id'=>$contentId]);
+			])->where(['Comments.content_id'=>$contentId])->order(['Comments.id DESC']);
 		$this->set([
             'success' => TRUE,
             'message' => "Comments Fetched",
@@ -39,13 +39,22 @@ class CommentsController extends AppController {
         $ndata['is_published']=1;
         $comment = $this->Comments->newEntity($ndata);
         //pr($content);exit();
-        $this->Comments->save($comment);
-        $this->set([
-            'success' => TRUE,
-            'message' => "Comment Saved",
-            'comment' => $comment,
-            '_serialize' => ['success', 'message', 'comment']
-        ]);
+        if($this->Comments->save($comment)){
+			$this->set([
+	            'success' => TRUE,
+	            'message' => "Comment Saved",
+	            'comment' => $comment,
+	            '_serialize' => ['success', 'message', 'comment']
+	        ]);
+		}else{
+			$this->set([
+	            'success' => FALSE,
+	            'message' => "Comment Saving failed",
+	            'comment' => $comment,
+	            '_serialize' => ['success', 'message', 'comment']
+	        ]);
+		}
+
     }
 
 
