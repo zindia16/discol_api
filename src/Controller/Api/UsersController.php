@@ -13,6 +13,27 @@ class UsersController extends AppController
         $this->Auth->allow(['login','logout','signup','test','isEmailExists','isUserExists']);
     }
 
+	public function getAuthUser(){
+		$user=$this->Auth->user();
+		if($user){
+			unset($user['email']);
+		}
+		$this->set([
+                    'success'=>TRUE,
+                    'user'=>$user,
+                    '_serialize'=>['success','user']
+                ]);
+	}
+
+	public function getUser($userId){
+		$user = $this->Users->get($userId);
+		$this->set([
+                    'success'=>TRUE,
+                    'user'=>$user,
+                    '_serialize'=>['success','user']
+                ]);
+	}
+
 	public function isEmailExists(){
 		$email=$this->request->data['value'];
 		$user=$this->Users->find('all')->where(['email'=>$email])->count();

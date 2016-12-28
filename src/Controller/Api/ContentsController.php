@@ -18,7 +18,7 @@ class ContentsController extends AppController {
 			$contents = $this->Contents->find('all', [
 	                'contain' => [
 	                    'Users' => [
-	                        'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
+	                        'fields' => ['id','username', 'first_name', 'last_name', 'profile_picture','is_active','is_deleted','created','modified']
 	                    ]
 	                ]
 	            ])->where([
