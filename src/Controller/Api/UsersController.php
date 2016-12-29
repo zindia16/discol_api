@@ -17,6 +17,7 @@ class UsersController extends AppController
 		$user=$this->Auth->user();
 		if($user){
 			unset($user['email']);
+			$user['isSelf']=TRUE;
 		}
 		$this->set([
                     'success'=>TRUE,
