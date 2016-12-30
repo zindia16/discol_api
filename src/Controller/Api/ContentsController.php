@@ -13,6 +13,28 @@ class ContentsController extends AppController {
         $this->Auth->allow(['index', 'logout', 'signup', 'test']);
     }
 
+	function extractImgOrVideo($text){
+		$header=[];
+		$image_url = "";
+		$video_url = "";
+		preg_match('/https?:\/\/[^ ]+?(?:\.jpg|\.png|\.gif)/', $text,$image_url);
+		preg_match('~\S*\bwww\.youtube\.com\S*~', $text, $video_url);
+		if(!empty($image_url[0])){
+			$header['image_url']=$image_url[0];
+		}
+		if(!empty($video_url[0])){
+			$header['video_url']=$video_url[0];
+		}
+		return $header;
+	}
+
+	function parseContent($content){
+		if(!empty($content)){
+			$header=$this->extractImgOrVideo($content->text);
+		}
+		exit();
+	}
+
     public function index($contentType=null) {
 		if($contentType){
 			$contents = $this->Contents->find('all', [
@@ -24,6 +46,7 @@ class ContentsController extends AppController {
 	            ])->where([
 	                'content_type' => $contentType
 	            ])->order(['Contents.id' => 'DESC'])->limit(50);
+
 		}else{
 			$contents = $this->Contents->find('all', [
 	                'contain' => [
@@ -34,12 +57,17 @@ class ContentsController extends AppController {
 	            ])->order(['Contents.id' => 'DESC'])->limit(50);
 		}
 
+		foreach($contents as $content){
+			$content['header']=$this->extractImgOrVideo($content->text);
+		}
+
         $this->set([
             'success' => TRUE,
             'message' => "Content fetched",
             'contents' => $contents,
             '_serialize' => ['success', 'message', 'contents']
         ]);
+
     }
 
     public function view($postId, $contentType = 'post') {
@@ -58,6 +86,7 @@ class ContentsController extends AppController {
                     'content_type' => $contentType,
                     'Contents.id' => $postId
                 ])->first();
+		$content['header']=$this->extractImgOrVideo($content->text);
         $this->set([
             'success' => TRUE,
             'message' => "Content fetched",
