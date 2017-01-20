@@ -7,59 +7,80 @@ use Cake\Event\Event;
 use Cake\Auth\DefaultPasswordHasher;
 
 class ContentsController extends AppController {
+    
+    public $paginate = [
+        'page' => 1,
+        'limit' => 10,
+        'maxLimit' => 100,
+        'fields' => [
+            'id', 'name', 'description'
+        ],
+        'sortWhitelist' => [
+            'id','created'
+        ]
+    ];
 
     public function beforeFilter(Event $event) {
         parent::beforeFilter($event);
-        $this->Auth->allow(['index', 'logout', 'signup', 'test']);
+        $this->Auth->allow(['index', 'logout', 'signup', 'test','testPaginate']);
+    }
+    
+    public function testPaginate(){
+        $contents = $this->
+        $this->set([
+            'success' => TRUE,
+            'message' => "Content fetched",
+            'contents' => $contents,
+            '_serialize' => ['success', 'message', 'contents']
+        ]);
     }
 
-	function extractImgOrVideo($text){
-		$header=[];
-		$image_url = "";
-		$video_url = "";
-		preg_match('/https?:\/\/[^ ]+?(?:\.jpg|\.png|\.gif)/', $text,$image_url);
-		preg_match('~\S*\bwww\.youtube\.com\S*~', $text, $video_url);
-		if(!empty($image_url[0])){
-			$header['image_url']=$image_url[0];
-		}
-		if(!empty($video_url[0])){
-			$header['video_url']=$video_url[0];
-		}
-		return $header;
-	}
+    function extractImgOrVideo($text) {
+        $header = [];
+        $image_url = "";
+        $video_url = "";
+        preg_match('/https?:\/\/[^ ]+?(?:\.jpg|\.png|\.gif)/', $text, $image_url);
+        preg_match('~\S*\bwww\.youtube\.com\S*~', $text, $video_url);
+        if (!empty($image_url[0])) {
+            $header['image_url'] = $image_url[0];
+        }
+        if (!empty($video_url[0])) {
+            $header['video_url'] = $video_url[0];
+        }
+        return $header;
+    }
 
-	function parseContent($content){
-		if(!empty($content)){
-			$header=$this->extractImgOrVideo($content->text);
-		}
-		exit();
-	}
+    function parseContent($content) {
+        if (!empty($content)) {
+            $header = $this->extractImgOrVideo($content->text);
+        }
+        exit();
+    }
 
-    public function index($contentType=null) {
-		if($contentType){
-			$contents = $this->Contents->find('all', [
-	                'contain' => [
-	                    'Users' => [
-	                        'fields' => ['id','username', 'first_name', 'last_name', 'profile_picture','is_active','is_deleted','created','modified']
-	                    ]
-	                ]
-	            ])->where([
-	                'content_type' => $contentType
-	            ])->order(['Contents.id' => 'DESC'])->limit(50);
+    public function index($contentType = null) {
+        if ($contentType) {
+            $contents = $this->Contents->find('all', [
+                        'contain' => [
+                            'Users' => [
+                                'fields' => ['id', 'username', 'first_name', 'last_name', 'profile_picture', 'is_active', 'is_deleted', 'created', 'modified']
+                            ]
+                        ]
+                    ])->where([
+                        'content_type' => $contentType
+                    ])->order(['Contents.id' => 'DESC'])->limit(50);
+        } else {
+            $contents = $this->Contents->find('all', [
+                        'contain' => [
+                            'Users' => [
+                                'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
+                            ]
+                        ]
+                    ])->order(['Contents.id' => 'DESC'])->limit(50);
+        }
 
-		}else{
-			$contents = $this->Contents->find('all', [
-	                'contain' => [
-	                    'Users' => [
-	                        'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
-	                    ]
-	                ]
-	            ])->order(['Contents.id' => 'DESC'])->limit(50);
-		}
-
-		foreach($contents as $content){
-			$content['header']=$this->extractImgOrVideo($content->text);
-		}
+        foreach ($contents as $content) {
+            $content['header'] = $this->extractImgOrVideo($content->text);
+        }
 
         $this->set([
             'success' => TRUE,
@@ -67,7 +88,6 @@ class ContentsController extends AppController {
             'contents' => $contents,
             '_serialize' => ['success', 'message', 'contents']
         ]);
-
     }
 
     public function view($postId, $contentType = 'post') {
@@ -76,17 +96,17 @@ class ContentsController extends AppController {
                         'Users' => [
                             'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
                         ],
-						'Comments'=>[
-							'Users' => [
-	                            'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
-	                        ]
-						]
+                        'Comments' => [
+                            'Users' => [
+                                'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
+                            ]
+                        ]
                     ]
                 ])->where([
                     'content_type' => $contentType,
                     'Contents.id' => $postId
                 ])->first();
-		$content['header']=$this->extractImgOrVideo($content->text);
+        $content['header'] = $this->extractImgOrVideo($content->text);
         $this->set([
             'success' => TRUE,
             'message' => "Content fetched",
