@@ -22,4 +22,7 @@ class StorageComponent extends Component
 	public function getUserCoverPath($imageName){
 		return Router::url('/',true).'profile_image/'.$imageName;
 	}
+  public function getUserProfileImagePath($imageName){
+		return Router::url('/',true).'profile_image/'.$imageName;
+	}
 }

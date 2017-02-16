@@ -19,14 +19,22 @@ class UsersController extends AppController
 		$res['message'] = 'expecting post data';
 		if($this->request->is('post')){
 			$data = $this->request->data();
-			//$fileName = time().'.'.$data['file_ext'];
-			$fileName = $this->Auth->user('username').'_cover_image.'.$data['file_ext'];
-			$file_path =  WWW_ROOT.'profile_image'.DS.$fileName;
+      $user = $this->Users->get($this->Auth->user('id'));
 
-			$image = $this->Storage->base64ToImg( $data['file'], $file_path );
-			$user = $this->Users->get($this->Auth->user('id'));
-			$user->cover_image= $fileName;
+      if(!empty($data['file'])){
+        $fileName = $this->Auth->user('username').'_cover_image.'.$data['file_ext'];
+  			$file_path =  WWW_ROOT.'profile_image'.DS.$fileName;
+  			$image = $this->Storage->base64ToImg( $data['file'], $file_path );
+  			$user->cover_image= $fileName;
+      }
+      if(!empty($data['ProfilePic'])){
+        $fileName = $this->Auth->user('username').'_profile_image.'.$data['profile_pic_file_ext'];
+  			$file_path =  WWW_ROOT.'profile_image'.DS.$fileName;
+  			$image = $this->Storage->base64ToImg( $data['ProfilePic'], $file_path );
+  			$user->profile_picture= $fileName;
+      }
 			$this->Users->save($user);
+
 			$res['success'] = true;
 			$res['message'] = 'your profile updated successfully!';
 
@@ -41,6 +49,9 @@ class UsersController extends AppController
 		$user=$this->Auth->user();
 		if($user && !empty($user['cover_image'])){
 			$user['cover_image']=$this->Storage->getUserCoverPath($user['cover_image']);
+		}
+    if($user && !empty($user['profile_picture'])){
+			$user['profile_picture']=$this->Storage->getUserProfileImagePath($user['profile_picture']);
 		}
 		$this->set([
                     'success'=>TRUE,
