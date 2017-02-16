@@ -11,13 +11,36 @@ class UsersController extends AppController
     public function beforeFilter(Event $event){
         parent::beforeFilter($event);
         $this->Auth->allow(['login','logout','signup','test','isEmailExists','isUserExists']);
+		$this->loadComponent('Storage');
     }
 
+	public function updateProfile(){
+		$res['success'] = false;
+		$res['message'] = 'expecting post data';
+		if($this->request->is('post')){
+			$data = $this->request->data();
+			//$fileName = time().'.'.$data['file_ext'];
+			$fileName = $this->Auth->user('username').'_cover_image.'.$data['file_ext'];
+			$file_path =  WWW_ROOT.'profile_image'.DS.$fileName;
+
+			$image = $this->Storage->base64ToImg( $data['file'], $file_path );
+			$user = $this->Users->get($this->Auth->user('id'));
+			$user->cover_image= $fileName;
+			$this->Users->save($user);
+			$res['success'] = true;
+			$res['message'] = 'your profile updated successfully!';
+
+		}
+		$this->set([
+					'success'=>$res['success'],
+					'message'=>$res['message'],
+					'_serialize'=>['success','message']
+				]);
+	}
 	public function getAuthUser(){
 		$user=$this->Auth->user();
-		if($user){
-			unset($user['email']);
-			$user['isSelf']=TRUE;
+		if($user && !empty($user['cover_image'])){
+			$user['cover_image']=$this->Storage->getUserCoverPath($user['cover_image']);
 		}
 		$this->set([
                     'success'=>TRUE,
@@ -28,6 +51,9 @@ class UsersController extends AppController
 
 	public function getUser($userId){
 		$user = $this->Users->get($userId);
+		if($user && !empty($user['cover_image'])){
+			$user['cover_image']=$this->Storage->getUserCoverPath($user['cover_image']);
+		}
 		$this->set([
                     'success'=>TRUE,
                     'user'=>$user,
