@@ -23,6 +23,7 @@ class ContentsController extends AppController {
     public function beforeFilter(Event $event) {
         parent::beforeFilter($event);
         $this->Auth->allow(['index', 'logout', 'signup', 'test','testPaginate']);
+        $this->loadComponent('Storage');
     }
     
     public function testPaginate(){
@@ -80,6 +81,9 @@ class ContentsController extends AppController {
 
         foreach ($contents as $content) {
             $content['header'] = $this->extractImgOrVideo($content->text);
+            if(!empty($content['user']['profile_picture'])){
+                $content['user']['profile_picture']=$this->Storage->getUserProfileImagePath($content['user']['profile_picture']);
+            }
         }
 
         $this->set([
@@ -107,6 +111,9 @@ class ContentsController extends AppController {
                     'Contents.id' => $postId
                 ])->first();
         $content['header'] = $this->extractImgOrVideo($content->text);
+        if(!empty($content['user']['profile_picture'])){
+            $content['user']['profile_picture']=$this->Storage->getUserProfileImagePath($content['user']['profile_picture']);
+        }
         $this->set([
             'success' => TRUE,
             'message' => "Content fetched",
