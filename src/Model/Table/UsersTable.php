@@ -7,6 +7,12 @@ use Cake\Validation\Validator;
 
 class UsersTable extends Table
 {
+    public function initialize(array $config) {
+        $this->addBehavior('Timestamp');
+
+        $this->hasMany('Comments');
+        $this->hasMany('Contents');
+    }
 
     public function validationDefault(Validator $validator)
     {
