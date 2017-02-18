@@ -7,7 +7,7 @@ use Cake\Event\Event;
 use Cake\Auth\DefaultPasswordHasher;
 
 class ContentsController extends AppController {
-    
+
     public $paginate = [
         'page' => 1,
         'limit' => 10,
@@ -25,7 +25,7 @@ class ContentsController extends AppController {
         $this->Auth->allow(['index', 'logout', 'signup', 'test','testPaginate']);
         $this->loadComponent('Storage');
     }
-    
+
     public function testPaginate(){
         $contents = $this->
         $this->set([
@@ -59,25 +59,30 @@ class ContentsController extends AppController {
     }
 
     public function index($contentType = null) {
-        if ($contentType) {
-            $contents = $this->Contents->find('all', [
-                        'contain' => [
-                            'Users' => [
-                                'fields' => ['id', 'username', 'first_name', 'last_name', 'profile_picture', 'is_active', 'is_deleted', 'created', 'modified']
-                            ]
-                        ]
-                    ])->where([
-                        'content_type' => $contentType
-                    ])->order(['Contents.id' => 'DESC'])->limit(50);
-        } else {
-            $contents = $this->Contents->find('all', [
-                        'contain' => [
-                            'Users' => [
-                                'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
-                            ]
-                        ]
-                    ])->order(['Contents.id' => 'DESC'])->limit(50);
+        $whereArray =[];
+        $limit =25;
+        $order = "DESC";
+        if($contentType){
+            $whereArray['Contents.content_type']=$contentType;
         }
+
+        if($this->request->query('userId')){
+            $whereArray['Contents.user_id']=$this->request->query('userId');
+        }
+        if($this->request->query('limit')){
+            $limit = $this->request->query('limit');
+        }
+        if($this->request->query('order')){
+            $order = $this->request->query('order');
+        }
+        $contents = $this->Contents->find('all', [
+            'contain' => [
+                'Users' => [
+                    'fields' => ['id', 'first_name', 'last_name', 'profile_picture']
+                ]
+            ]
+        ])->where($whereArray)->order(['Contents.id' => $order])->limit($limit);
+
 
         foreach ($contents as $content) {
             $content['header'] = $this->extractImgOrVideo($content->text);
