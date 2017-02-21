@@ -146,7 +146,29 @@ class UsersController extends AppController
             '_serialize'=>['success','message']
         ]);
     }
-
+	public function changePassword(){
+        if ($this->request->is('post')) {
+            $data = $this->request->data();                 
+            $res['success'] = FALSE;
+            $user = $this->Users->get($this->Auth->user('id'))->toArray();
+            if ((new DefaultPasswordHasher)->check($data['oldPassword'], $user['password'])) { 
+                if($data['newPassword'] == $data['confPassword']){
+                    $userEntity = $this->Users->get($this->Auth->user('id'));
+                    $userEntity->password = $data['newPassword'];
+                    if($this->Users->save($userEntity)){
+                        $res['success'] = TRUE;                        
+                        $res['message'] = 'Password Changed Successfully.';
+                    }
+                }
+                
+            }else{
+                 $res['success'] = FALSE;
+                 $res['message'] = 'Your old password did not match.';
+            }
+            echo json_encode($res);
+            exit();
+        }
+    }
     public function index(){
         $this->set('users', $this->Users->find('all'));
     }
