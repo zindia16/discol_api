@@ -13,21 +13,13 @@ class UsersController extends AppController
         $this->Auth->allow(['login','logout','signup','test','isEmailExists','isUserExists']);
         $this->loadComponent('Storage');
     }
-    public function matchOldPassword($data=array()){
-      //$obj = new DefaultPasswordHasher;
-      pr($this->Auth->user('password')); exit;
-      /*if(!empty($data['old_password'])){
-        $user = $this->Users->get($this->Atuh->user('id'));
-        //if($user->pasword);
-      }*/
-    }
+
     public function updateProfile(){
         $res['success'] = false;
         $res['message'] = 'expecting post data';
         if($this->request->is('post')){
             $data = $this->request->data();
             $user = $this->Users->get($this->Auth->user('id'));
-
             if(!empty($data['file'])){
                 $fileName = $this->Auth->user('username').'_cover_image.'.$data['file_ext'];
                 $file_path =  WWW_ROOT.'profile_image'.DS.$fileName;
@@ -41,10 +33,8 @@ class UsersController extends AppController
                 $user->profile_picture= $fileName;
             }
             $this->Users->save($user);
-
             $res['success'] = true;
             $res['message'] = 'your profile updated successfully!';
-
         }
         $this->set([
             'success'=>$res['success'],
@@ -175,11 +165,14 @@ class UsersController extends AppController
                         $res['success'] = TRUE;
                         $res['message'] = 'Password Changed Successfully.';
                     }
-                }
+                }else{
+					$res['success'] = FALSE;
+                    $res['message'] = 'Confirm password is not same as new password. please enter both password again!!';
+				}
 
             }else{
                  $res['success'] = FALSE;
-                 $res['message'] = 'Your old password did not match.';
+                 $res['message'] = 'Your old password is wrong!';
             }
             echo json_encode($res);
             exit();

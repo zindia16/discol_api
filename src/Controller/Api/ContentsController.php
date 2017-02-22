@@ -2,11 +2,11 @@
 
 namespace App\Controller\Api;
 
-use App\Controller\AppController;
 use Cake\Event\Event;
 use Cake\Auth\DefaultPasswordHasher;
 
 class ContentsController extends AppController {
+
 
     public $paginate = [
         'page' => 1,
@@ -22,7 +22,7 @@ class ContentsController extends AppController {
 
     public function beforeFilter(Event $event) {
         parent::beforeFilter($event);
-        $this->Auth->allow(['index', 'logout', 'signup', 'test','testPaginate']);
+        $this->Auth->allow(['signup', 'test','testPaginate']);
         $this->loadComponent('Storage');
     }
 
@@ -86,6 +86,7 @@ class ContentsController extends AppController {
 
         foreach ($contents as $content) {
             $content['header'] = $this->extractImgOrVideo($content->text);
+			$content['doesThisUserLikesContent']=$this->__doesThisUserLikesContent($content->id,$this->Auth->user('id'));
             if(!empty($content['user']['profile_picture'])){
                 $content['user']['profile_picture']=$this->Storage->getUserProfileImagePath($content['user']['profile_picture']);
             }
@@ -119,6 +120,7 @@ class ContentsController extends AppController {
         if(!empty($content['user']['profile_picture'])){
             $content['user']['profile_picture']=$this->Storage->getUserProfileImagePath($content['user']['profile_picture']);
         }
+		$content['doesThisUserLikesContent']=$this->__doesThisUserLikesContent($content->id,$this->Auth->user('id'));		
         $this->set([
             'success' => TRUE,
             'message' => "Content fetched",

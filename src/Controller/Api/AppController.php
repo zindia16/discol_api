@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use Cake\Controller\Controller;
 use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
 
 class AppController extends Controller{
 
@@ -29,4 +30,16 @@ class AppController extends Controller{
             $this->set('_serialize', true);
         }
     }
+
+	public function __doesThisUserLikesContent($contentId,$userId){
+		$likesTable = TableRegistry::get('Likes');
+		$likes = $likesTable->find('all')->where([
+				'content_id'=>$contentId,
+				'user_id'=>$userId
+			])->count();
+		if($likes){
+			return true;
+		}
+		return false;
+	}
 }
